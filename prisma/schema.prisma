@@ -18,5 +18,20 @@ model User {
   name String
   email String @unique
   userToken String @unique
+  apiKeyIds String
   createdAt DateTime @default(now())
+
+  apiKey ApiKey[]
+}
+
+model ApiKey {
+  id String @id @default(uuid())
+  key String @unique
+  userId String
+  isActive Boolean
+  rateLimit Int
+  windowSeconds Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
