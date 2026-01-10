@@ -21,7 +21,7 @@ model User {
   apiKeyIds String
   createdAt DateTime @default(now())
 
-  apiKey ApiKey[]
+  apiKeys ApiKey[]
 }
 
 model ApiKey {
