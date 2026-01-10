@@ -1,8 +1,5 @@
 import "dotenv/config";
-import jwt from "jsonwebtoken";
 import { getPrisma } from "../../libs/prisma";
-
-const JWT_SECRET = `${process.env.JWT_SECRET}`;
 
 export class UserService {
   private prisma: any;

@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import { UserService } from "./user.service";
 import { success, error } from "simple-api-responser";
 
-const userService = new UserService();
-
 export class UserController {
   constructor(private userService: UserService = new UserService()) {}
 
