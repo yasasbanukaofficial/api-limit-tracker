@@ -22,14 +22,8 @@ export class UserService {
     }
 
     const userObj = { name, email };
-
-    const token = jwt.sign(userObj, JWT_SECRET);
-
     return await prisma.user.create({
-      data: {
-        ...userObj,
-        userToken: token,
-      },
+      data: { userObj },
     });
   }
 }

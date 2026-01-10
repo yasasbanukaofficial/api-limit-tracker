@@ -10,7 +10,6 @@ jest.mock("../../src/libs/prisma", () => ({
   getPrisma: jest.fn(),
 }));
 
-const JWT_SECRET = `${process.env.JWT_SECRET}`;
 const mockGetPrisma = getPrisma as jest.MockedFunction<typeof getPrisma>;
 
 describe("Create user | UserService", () => {
@@ -35,10 +34,6 @@ describe("Create user | UserService", () => {
 
     expect(user).toHaveProperty("id");
     expect(user).toHaveProperty("userToken");
-
-    // const payload = jwt.verify(user.userToken, JWT_SECRET);
-    // expect(payload).toHaveProperty("userId");
-
     expect(user.email).toBe("john@mail.com");
   });
 
