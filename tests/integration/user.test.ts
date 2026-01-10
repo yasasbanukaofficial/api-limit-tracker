@@ -1,10 +1,8 @@
 import "dotenv/config";
-import jwt from "jsonwebtoken";
 import { UserService } from "../../src/modules/user/user.service";
 import { getPrisma } from "../../src/libs/prisma";
 import { prismaMock } from "../__mocks__/prisma";
 import { UserController } from "../../src/modules/user/user.controller";
-import { error, success } from "simple-api-responser";
 
 jest.mock("../../src/libs/prisma", () => ({
   getPrisma: jest.fn(),
