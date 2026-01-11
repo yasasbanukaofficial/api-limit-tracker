@@ -7,10 +7,10 @@ export class ApiService {
   constructor(prisma?: any) {
     this.prisma = prisma || getPrisma();
   }
-  async createAPIKey(userId: string) {
+  async createAPIKey(email: string) {
     const prisma = await this.prisma;
     const existing = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { email },
       include: { apiKeys: true },
     });
 
@@ -28,7 +28,7 @@ export class ApiService {
     return await prisma.apiKey.create({
       data: {
         key: apiKey,
-        userId,
+        email,
         isActive: true,
       },
     });

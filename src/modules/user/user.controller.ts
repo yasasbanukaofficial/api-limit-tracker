@@ -19,4 +19,19 @@ export class UserController {
       return res.status(500).json(error("Internal Server Error", 500));
     }
   }
+
+  async findUser(req: Request, res: Response) {
+    const { email } = req.body as { email: string };
+    try {
+      const user = await this.userService.findUser(email);
+      return res
+        .status(200)
+        .json(success(user, "Fetched user successfully", 200));
+    } catch (err: any) {
+      if (err.message === "User does not exist") {
+        return res.status(404).json(error(err.message, 404));
+      }
+      return res.status(500).json(error("Internal Server Error", 500));
+    }
+  }
 }

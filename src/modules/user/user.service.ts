@@ -23,4 +23,15 @@ export class UserService {
       data: { userObj },
     });
   }
+
+  async findUser(email: string) {
+    const prisma = await this.prisma;
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new Error("User does not exist");
+    }
+    return user;
+  }
 }
