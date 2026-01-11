@@ -29,8 +29,8 @@ model ApiKey {
   key String @unique
   userId String
   isActive Boolean
-  rateLimit Int
-  windowSeconds Int
+  rateLimit Int @default(5)
+  windowSeconds Int @default(30)
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

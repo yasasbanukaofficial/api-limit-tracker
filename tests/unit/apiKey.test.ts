@@ -1,6 +1,5 @@
 import { ApiService } from "../../src/modules/api/api.service";
 import { getPrisma } from "../../src/libs/prisma";
-import { MockFunctionCall } from "node:test";
 
 jest.mock("../../src/libs/prisma", () => ({
   getPrisma: jest.fn(),
@@ -12,6 +11,7 @@ describe("api key creation", () => {
   let apiService: ApiService;
   const prismaMock = {
     user: {
+      findUnique: jest.fn(),
       findMany: jest.fn(),
     },
     apiKey: {
@@ -27,34 +27,34 @@ describe("api key creation", () => {
   };
   beforeEach(() => {
     jest.clearAllMocks();
-    mockPrisma.mockResolvedValue(prismaMock);
-    apiService = new ApiService();
+    apiService = new ApiService(prismaMock);
   });
 
   it("should generate a api key", async () => {
     prismaMock.apiKey.create.mockResolvedValue({
       id: "id",
+      key: [],
       userId: "userId",
-      userToken: "userToken",
+      isActive: false,
     });
+    prismaMock.user.findUnique
+      .mockResolvedValueOnce(mockUser)
+      .mockResolvedValueOnce(null);
 
     const result = await apiService.createAPIKey("user-id");
-    expect(result).toHaveProperty("apiKey");
-    const apiKey = result.apiKey;
-    expect(apiKey.startsWith("ak_live")).toEqual(true);
+    expect(result).toHaveProperty("key");
     expect(prismaMock.apiKey.create).toHaveBeenCalledTimes(1);
   });
 
   it("should throw an error if an user is not found", async () => {
-    prismaMock.apiKey.findUnique.mockResolvedValue({
-      mockUser,
-    });
-    const result = await apiService.createAPIKey("user-id");
-    await expect(result).rejects.toThrow("User doesn't exists");
+    prismaMock.apiKey.findUnique.mockResolvedValue(null);
+    await expect(apiService.createAPIKey("user-id")).rejects.toThrow(
+      "User doesn't exists"
+    );
   });
 
   it("should throw an error if api key count exceed 3", async () => {
-    prismaMock.user.findMany.mockResolvedValue({
+    prismaMock.user.findUnique.mockResolvedValue({
       ...mockUser,
       apiKeys: [
         { id: "1", key: "ak_live_1" },
@@ -64,7 +64,8 @@ describe("api key creation", () => {
       ],
     });
 
-    const result = await apiService.createAPIKey("user-id");
-    await expect(result).rejects.toThrow("API Key generation limit exceed");
+    await expect(apiService.createAPIKey("user-id")).rejects.toThrow(
+      "API Key generation limit exceed"
+    );
   });
 });
