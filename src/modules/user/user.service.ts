@@ -18,9 +18,8 @@ export class UserService {
       throw new Error("Email already exists");
     }
 
-    const userObj = { name, email };
     return await prisma.user.create({
-      data: { userObj },
+      data: { name, email },
     });
   }
 
