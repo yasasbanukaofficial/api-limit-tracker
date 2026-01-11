@@ -29,7 +29,7 @@ export class UserController {
         .status(200)
         .json(success(user, "Fetched user successfully", 200));
     } catch (err: any) {
-      if (err.message === "User does not exist") {
+      if (err.message === "User doesn't exist") {
         return res.status(404).json(error(err.message, 404));
       }
       return res.status(500).json(error("Internal Server Error", 500));

@@ -53,7 +53,7 @@ describe("User operations | UserService", () => {
     prismaMock.user.findUnique.mockResolvedValue(null);
 
     await expect(userService.findUser("nonexistent@mail.com")).rejects.toThrow(
-      "User does not exist"
+      "User doesn't exist"
     );
   });
 });
@@ -123,12 +123,12 @@ describe("CRUD operations | UserController", () => {
     });
   });
 
-  it("should return an error if user does not exist", async () => {
-    mockService.findUser.mockRejectedValue(new Error("User does not exist"));
+  it("should return an error if User doesn't exist", async () => {
+    mockService.findUser.mockRejectedValue(new Error("User doesn't exist"));
     await userController.findUser(req, res);
     expect(res.json).toHaveBeenCalledWith({
       success: false,
-      message: "User does not exist",
+      message: "User doesn't exist",
       status: 404,
     });
   });

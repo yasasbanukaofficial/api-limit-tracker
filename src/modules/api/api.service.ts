@@ -1,6 +1,7 @@
 import "dotenv/config";
 import crypto from "crypto";
 import { getPrisma } from "../../libs/prisma";
+import { connect } from "http2";
 
 export class ApiService {
   private prisma: any;
@@ -28,8 +29,12 @@ export class ApiService {
     return await prisma.apiKey.create({
       data: {
         key: apiKey,
-        email,
         isActive: true,
+        user: {
+          connect: {
+            id: existing.id,
+          },
+        },
       },
     });
   }

@@ -29,7 +29,7 @@ export class UserService {
       where: { email },
     });
     if (!user) {
-      throw new Error("User does not exist");
+      throw new Error("User doesn't exist");
     }
     return user;
   }

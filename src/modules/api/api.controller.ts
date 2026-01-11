@@ -27,7 +27,7 @@ export class ApiController {
       ) {
         return res.status(409).json(error(err.message, 409));
       }
-      return res.status(500).json(error("Internal Server Error", 500));
+      return res.status(500).json(error(err.message, 500));
     }
   }
 }
