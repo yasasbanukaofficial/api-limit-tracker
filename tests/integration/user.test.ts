@@ -56,12 +56,50 @@ describe("User operations | UserService", () => {
       "User doesn't exist"
     );
   });
+
+  describe("updateUser", () => {
+    it("should update a user if exists", async () => {
+      prismaMock.user.findUnique.mockResolvedValue(mockUser);
+      prismaMock.user.update.mockResolvedValue({
+        ...mockUser,
+        name: "Jane Doe",
+      });
+      const updated = await userService.updateUser("Jane Doe", mockUser.email);
+      expect(updated).toHaveProperty("id");
+      expect(updated.name).toBe("Jane Doe");
+    });
+
+    it("should throw an error if user does not exist", async () => {
+      prismaMock.user.findUnique.mockResolvedValue(null);
+      await expect(
+        userService.updateUser("Jane Doe", "notfound@mail.com")
+      ).rejects.toThrow("User doesn't exists");
+    });
+  });
+
+  describe("deleteUser", () => {
+    it("should delete a user if exists", async () => {
+      prismaMock.user.findUnique.mockResolvedValue(mockUser);
+      prismaMock.user.delete.mockResolvedValue(mockUser);
+      const deleted = await userService.deleteUser(mockUser.email);
+      expect(deleted).toHaveProperty("id");
+      expect(deleted.email).toBe(mockUser.email);
+    });
+
+    it("should throw an error if user does not exist", async () => {
+      prismaMock.user.findUnique.mockResolvedValue(null);
+      await expect(userService.deleteUser("notfound@mail.com")).rejects.toThrow(
+        "User doesn't exists"
+      );
+    });
+  });
 });
 
 describe("CRUD operations | UserController", () => {
   const mockService: any = {
     createUser: jest.fn(),
     findUser: jest.fn(),
+    updateUser: jest.fn(),
   };
   const userController = new UserController(mockService);
 
@@ -74,6 +112,83 @@ describe("CRUD operations | UserController", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe("updateUser", () => {
+    it("updates a user successfully", async () => {
+      mockService.updateUser.mockResolvedValue({ ...user, name: "Jane" });
+      const req: any = { body: { name: "Jane", email: user.email } };
+      await userController.updateUser(req, res);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        message: "User updated successfully",
+        status: 200,
+        data: { ...user, name: "Jane" },
+      });
+    });
+    describe("deleteUser", () => {
+      it("deletes a user successfully", async () => {
+        mockService.deleteUser = jest.fn().mockResolvedValue(undefined);
+        const req: any = { body: { email: user.email } };
+        await userController.deleteUser(req, res);
+        expect(res.json).toHaveBeenCalledWith({
+          success: true,
+          message: "User deleted successfully",
+          status: 200,
+          data: null,
+        });
+      });
+
+      it("should return an error if user does not exist", async () => {
+        mockService.deleteUser = jest
+          .fn()
+          .mockRejectedValue(new Error("User doesn't exist"));
+        const req: any = { body: { email: "notfound@mail.com" } };
+        await userController.deleteUser(req, res);
+        expect(res.json).toHaveBeenCalledWith({
+          success: false,
+          message: "User doesn't exist",
+          status: 404,
+        });
+      });
+
+      it("should return internal server error if anything fails", async () => {
+        mockService.deleteUser = jest
+          .fn()
+          .mockRejectedValue(new Error("Internal Server Error"));
+        const req: any = { body: { email: user.email } };
+        await userController.deleteUser(req, res);
+        expect(res.json).toHaveBeenCalledWith({
+          success: false,
+          message: "Internal Server Error",
+          status: 500,
+        });
+      });
+    });
+
+    it("should return an error if user does not exist", async () => {
+      mockService.updateUser.mockRejectedValue(
+        new Error("User doesn't exists")
+      );
+      await userController.updateUser(req, res);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "User doesn't exists",
+        status: 409,
+      });
+    });
+
+    it("should return internal server error if anything fails", async () => {
+      mockService.updateUser.mockRejectedValue(
+        new Error("Internal Server Error")
+      );
+      await userController.updateUser(req, res);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: "Internal Server Error",
+        status: 500,
+      });
+    });
   });
 
   it("creates a user successfully", async () => {

@@ -23,6 +23,39 @@ export class UserService {
     });
   }
 
+  async updateUser(name: string, email: string) {
+    const prisma = await this.prisma;
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new Error("User doesn't exist");
+    }
+
+    return await prisma.user.update({
+      where: { email },
+      data: { name, email },
+    });
+  }
+
+  async deleteUser(email: string) {
+    const prisma = await this.prisma;
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      throw new Error("User doesn't exist");
+    }
+
+    return await prisma.user.delete({
+      where: {
+        email,
+      },
+    });
+  }
+
   async findUser(email: string) {
     const prisma = await this.prisma;
     const user = await prisma.user.findUnique({

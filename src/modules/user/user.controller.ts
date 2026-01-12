@@ -14,10 +14,29 @@ export class UserController {
         .status(200)
         .json(success(user, "Fetched user successfully", 200));
     } catch (err: any) {
-      if (err.message === "Email already exists") {
-        return res.status(409).json(error("Email already exists", 409));
-      }
-      return res.status(500).json(error("Internal Server Error", 500));
+      return res.status(500).json(error(err.message, 500));
+    }
+  }
+
+  async updateUser(req: Request, res: Response) {
+    const { name, email } = req.body as { name: string; email: string };
+    try {
+      const user = await this.userService.updateUser(name, email);
+      return res
+        .status(200)
+        .json(success(user, "User updated successfully", 200));
+    } catch (err: any) {
+      return res.status(500).json(error(err.message, 500));
+    }
+  }
+
+  async deleteUser(req: Request, res: Response) {
+    const { email } = req.body as { email: string };
+    try {
+      await this.userService.deleteUser(email);
+      return res.status(200).json(success("User deleted successfully"));
+    } catch (err: any) {
+      return res.status(500).json(error(err.message, 500));
     }
   }
 
@@ -32,7 +51,7 @@ export class UserController {
       if (err.message === "User doesn't exist") {
         return res.status(404).json(error(err.message, 404));
       }
-      return res.status(500).json(error("Internal Server Error", 500));
+      return res.status(500).json(error(err.message, 500));
     }
   }
 }
